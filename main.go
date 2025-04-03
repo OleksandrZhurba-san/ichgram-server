@@ -1,13 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
+	"github.com/OleksandrZhurba-san/ichgram-server/common/db"
 	"github.com/OleksandrZhurba-san/ichgram-server/server"
 )
 
 func main() {
+
+	db.Init()
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -16,8 +18,5 @@ func main() {
 
 	r := server.Init()
 
-	fmt.Printf("listening on port: %s", port)
-
 	r.Run(":" + port)
-
 }
