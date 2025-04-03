@@ -1,22 +1,18 @@
 package main
 
 import (
-	"os"
-
 	"github.com/OleksandrZhurba-san/ichgram-server/common/db"
 	"github.com/OleksandrZhurba-san/ichgram-server/server"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 
+	_ = godotenv.Load()
+
 	db.Init()
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
+	server.Init()
 
-	r := server.Init()
-
-	r.Run(":" + port)
 }
+

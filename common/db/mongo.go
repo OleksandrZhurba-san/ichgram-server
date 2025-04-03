@@ -15,6 +15,7 @@ var Client *mongo.Client
 
 func Init()  {
 	uri := os.Getenv("MONGO_URI")
+	fmt.Printf("mongo uri: %s", uri)
 	if uri == "" {
 		uri = "mongodb://localhost:27017"
 	}

@@ -1,14 +1,20 @@
 package server
 
 import (
-	"github.com/gin-gonic/gin"
+	"os"
+
+	"github.com/OleksandrZhurba-san/ichgram-server/internal/router"
 )
 
-func Init() *gin.Engine{
-	r := gin.Default()
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{"message": "welcome to my new home"})
-	})
+func Init() {
 
-	return r
+	r := router.SetupRouter()
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
+	r.Run(":" + port)
+
 }
