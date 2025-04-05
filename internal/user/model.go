@@ -23,3 +23,24 @@ type User struct {
 	Following      []primitive.ObjectID `bson:"following,omitempty" json:"following,omitempty"`
 	CreatedAt      time.Time            `bson:"created_at,omitempty" json:"created_at,omitempty"`
 }
+
+// NewUserFromInput returns a new User with default values applied.
+func NewUserFromInput(input *User) *User {
+	return &User{
+		FullName:       input.FullName,
+		Username:       input.Username,
+		Email:          input.Email,
+		Password:       input.Password,
+		Bio:            "",
+		Website:        "",
+		Image:          "",
+		PostsCount:     0,
+		FollowersCount: 0,
+		FollowingCount: 0,
+		Posts:          []primitive.ObjectID{},
+		Followers:      []primitive.ObjectID{},
+		Following:      []primitive.ObjectID{},
+		CreatedAt:      time.Now(),
+	}
+
+}

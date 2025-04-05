@@ -15,13 +15,14 @@ func InsertUser(user *User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	user.CreatedAt = time.Now()
+
 	result, err := collection.InsertOne(ctx, user)
 	if err != nil {
 		return err
 	}
 
 	user.ID = result.InsertedID.(primitive.ObjectID)
-	user.CreatedAt = time.Now()
 
 	return nil
 

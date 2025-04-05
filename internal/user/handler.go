@@ -14,7 +14,8 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	if err := InsertUser(&input); err != nil {
+	newUser := NewUserFromInput(&input)
+	if err := InsertUser(newUser); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -22,7 +23,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"id":      input.ID.Hex(),
+		"id":      newUser.ID.Hex(),
 		"message": "User created successfully",
 	})
 }
