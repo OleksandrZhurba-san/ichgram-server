@@ -15,11 +15,20 @@ func CreateUser(c *gin.Context) {
 	}
 
 	newUser := NewUserFromInput(&input)
+
+	_ = newUser.BeforeSave()
+
 	if err := InsertUser(newUser); err != nil {
+		if err.Error() == "User Already Exists" {
+			c.JSON(http.StatusConflict, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
