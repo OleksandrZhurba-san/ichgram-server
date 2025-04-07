@@ -42,5 +42,4 @@ func NewUserFromInput(input *User) *User {
 		Following:      []primitive.ObjectID{},
 		CreatedAt:      time.Now(),
 	}
-
 }

@@ -42,3 +42,26 @@ func InsertUser(user *User) error {
 	return nil
 
 }
+
+func FindByEmailOrUsername(email, username string) (*User, error) {
+
+	var user User
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	collection := db.GetCollection("ichgram", "users")
+
+	err := collection.FindOne(ctx, bson.M{
+		"$or": []bson.M{
+			{"email": email},
+			{"username": username},
+		},
+	}).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+
+}
