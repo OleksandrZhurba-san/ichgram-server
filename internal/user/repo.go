@@ -1,27 +1,36 @@
 package user
 
 import (
-	"context"
 	"errors"
 	"time"
 
-	"github.com/OleksandrZhurba-san/ichgram-server/common/db"
+	"github.com/OleksandrZhurba-san/ichgram-server/common/contextutil"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func InsertUser(user *User) error {
-	collection := db.GetCollection("ichgram", "users")
+type UserRepository struct {
+	Collection *mongo.Collection
+}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+func NewUserRepository(db *mongo.Database) *UserRepository {
+	return &UserRepository{
+		Collection: db.Collection("users"),
+	}
+}
+
+func (r *UserRepository) InsertUser(user *User) error {
+
+	ctx, cancel := contextutil.WithTimeout()
 	defer cancel()
 
 	user.CreatedAt = time.Now()
 
 	var existing User
 
-	err := collection.FindOne(ctx, bson.M{
+	err := r.Collection.FindOne(ctx, bson.M{
 		"$or": []bson.M{
 			{"email": user.Email},
 			{"username": user.Username},
@@ -32,7 +41,7 @@ func InsertUser(user *User) error {
 		return errors.New("User Already Exists")
 	}
 
-	result, err := collection.InsertOne(ctx, user)
+	result, err := r.Collection.InsertOne(ctx, user)
 	if err != nil {
 		return err
 	}
@@ -43,16 +52,14 @@ func InsertUser(user *User) error {
 
 }
 
-func FindByEmailOrUsername(email, username string) (*User, error) {
+func (r *UserRepository) FindByEmailOrUsername(email, username string) (*User, error) {
+
+	ctx, cancel := contextutil.WithTimeout()
+	defer cancel()
 
 	var user User
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	collection := db.GetCollection("ichgram", "users")
-
-	err := collection.FindOne(ctx, bson.M{
+	err := r.Collection.FindOne(ctx, bson.M{
 		"$or": []bson.M{
 			{"email": email},
 			{"username": username},
@@ -64,4 +71,25 @@ func FindByEmailOrUsername(email, username string) (*User, error) {
 
 	return &user, nil
 
+}
+
+func (r *UserRepository) FindByUserID(userID string) (*User, error) {
+
+	ctx, cancel := contextutil.WithTimeout()
+	defer cancel()
+
+	var user User
+
+	id, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": id}
+	err = r.Collection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }

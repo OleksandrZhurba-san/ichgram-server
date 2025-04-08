@@ -3,13 +3,13 @@ package router
 import (
 	"github.com/OleksandrZhurba-san/ichgram-server/internal/user"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func SetupRouter() *gin.Engine {
-	r := gin.Default()
+func InitRoutes(r *gin.RouterGroup, db *mongo.Database) {
 
-	api := r.Group("/api")
-	user.RegisterRoutes(api)
+	// User module
+	userGroup := r.Group("/users")
+	user.InitRoutes(userGroup, db)
 
-	return r
 }

@@ -2,10 +2,14 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func RegisterRoutes(rg *gin.RouterGroup) {
-	userRoutes := rg.Group("/users")
-	userRoutes.POST("/", CreateUser)
-	userRoutes.POST("/login", LoginUser)
+func InitRoutes(r *gin.RouterGroup, db *mongo.Database) {
+	repo := NewUserRepository(db)
+	handle := NewHanlder(repo)
+
+	r.POST("/register", handle.Register)
+	r.POST("/login", handle.LoginUser)
 }
+
