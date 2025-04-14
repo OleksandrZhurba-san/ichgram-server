@@ -73,20 +73,15 @@ func (r *UserRepository) FindByEmailOrUsername(email, username string) (*User, e
 
 }
 
-func (r *UserRepository) FindByUserID(userID string) (*User, error) {
+func (r *UserRepository) FindByUserID(userID primitive.ObjectID) (*User, error) {
 
 	ctx, cancel := contextutil.WithTimeout()
 	defer cancel()
 
 	var user User
 
-	id, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	filter := bson.M{"_id": id}
-	err = r.Collection.FindOne(ctx, filter).Decode(&user)
+	filter := bson.M{"_id": userID}
+	err := r.Collection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		return nil, err
 	}

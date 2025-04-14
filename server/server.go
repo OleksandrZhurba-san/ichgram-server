@@ -22,6 +22,8 @@ func Init() {
 		port = "3000"
 	}
 
+	r.SetTrustedProxies(nil)
+
 	r.Run(":" + port)
 
 }

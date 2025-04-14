@@ -6,6 +6,7 @@ import (
 
 	"github.com/OleksandrZhurba-san/ichgram-server/internal/auth"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -104,3 +105,28 @@ func (h *Handler) LoginUser(c *gin.Context) {
 	c.JSON(http.StatusAccepted, gin.H{"token": token})
 }
 
+func (h *Handler) GetUserByID(c *gin.Context) {
+
+	idValue, exists := c.Get("objectID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Missing user ID in context",
+		})
+		return
+	}
+	userID := idValue.(primitive.ObjectID)
+
+	user, err := h.Repo.FindByUserID(userID)
+	if err != nil {
+		log.Println("Failed to get user by id: ", err)
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "User Not Found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"user": user,
+	})
+
+}
